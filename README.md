@@ -1,6 +1,11 @@
 
 
 **Care Signals work requirement part one, Create a proof of concept with the following propertes:**<br>
+
+Milestone1: Working Broadcast POC - broadcast messages to all test members ("flu shot campaign") AND LLMgenerated samples pertinent to member segmentations. Complete data mapping for both broad outreach segments 
+and individual needs. Basic routing infrastructure in place.<br>
+
+
 Explain what the application is all about and how to use it<br>
 
 User can request many user's to be messaged about medical relatied topics<br>
