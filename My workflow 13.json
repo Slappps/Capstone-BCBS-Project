@@ -1,0 +1,330 @@
+{
+  "name": "My workflow 13",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Question: {{ $('When chat message received').item.json.chatInput }}\n \nSQL Query:",
+        "options": {
+          "systemMessage": "=You are an expert PostgreSQL query generator for Supabase databases.\n\nDatabase Schema:\n{{ $json.Output }}\n\nQuery Generation Rules:\n\nOutput only the raw SQL query — no explanations, markdown, comments, or formatting characters (e.g., \\n).\n\nUse valid, executable PostgreSQL syntax.\n\nAlways parameterize inputs or properly escape values to prevent SQL injection.\n\nUse explicit column names instead of SELECT *.\n\nApply LOWER() to all text-related conditions and WHERE clauses to ensure case-insensitive matching. like LOWER (preferred_contact_method)= LOWER('phone')\n\nOptimize for performance:\n\nUse indexes where applicable in WHERE and JOIN conditions.\n\nPrefer JOINs over subqueries when possible.\n\nUse efficient GROUP BY clauses for aggregations.\n\nInclude meaningful WHERE filters whenever relevant.\n\nEnsure the query returns the correct and minimal necessary data.\n\nFinal output must be pure SQL — no additional text, markdown, or formatting."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        336
+      ],
+      "id": "210f2adf-f6b7-4f93-9117-75192af59009",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        528
+      ],
+      "id": "10cfe5b3-c6ca-4aec-aa3b-457d15411a64",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "JkMWoahO6AlSO0M2",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        128,
+        336
+      ],
+      "id": "a5d48ed0-5c2e-4c15-8d53-1465a3aef8b4",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "2vOfIETdAWsmZS1v",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    table_schema,\n    table_name,\n    column_name,\n    data_type,\n    character_maximum_length,\n    is_nullable,\n    column_default\nFROM information_schema.columns\nWHERE table_schema = 'public'\nORDER BY table_schema, table_name, ordinal_position;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -864,
+        368
+      ],
+      "id": "f954f7a0-d8cb-4d69-8948-1acba41fa813",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "2vOfIETdAWsmZS1v",
+          "name": "Postgres account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        368
+      ],
+      "id": "ef135710-747f-4c29-8d81-8e8aeec31e44",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1168,
+        368
+      ],
+      "id": "c8c745b3-17a7-44b3-9ad7-9e6ddbd91ebc",
+      "name": "When chat message received",
+      "webhookId": "ac7671e5-491a-4253-b0ce-38da1b562e3c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8e7809e9-c527-46d8-bad0-96fca3f055c9",
+              "name": "Output",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        368
+      ],
+      "id": "74c2745b-54fc-4089-80e4-f82421b4c0cf",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "fromEmail": "jwilb33@gmail.com",
+        "toEmail": "jwilb88@gmail.com",
+        "subject": "={{ $json.first_name }}",
+        "html": "={{ $json.output }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1232,
+        336
+      ],
+      "id": "90f4d7a8-ceaf-4c1b-ac5c-723dc68bdca6",
+      "name": "Send email",
+      "webhookId": "bbcb2209-937c-4c49-8e98-5de7b0852554",
+      "credentials": {
+        "smtp": {
+          "id": "Jpbxhq6jNfWTsxUm",
+          "name": "SMTP account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "assistant",
+        "assistantId": {
+          "__rl": true,
+          "value": "asst_yAtacwb5Gk3jmyg4J3ov7rI0",
+          "mode": "list",
+          "cachedResultName": "My Assistant"
+        },
+        "prompt": "define",
+        "text": "Write a nice reminder to get a vaccine",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        560,
+        112
+      ],
+      "id": "aad0f469-00b8-4838-91c1-d4cdd2a9e70e",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "JkMWoahO6AlSO0M2",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        352,
+        112
+      ],
+      "id": "3dde7255-36e0-40fb-bade-2f09de4e6bbc",
+      "name": "Aggregate1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6b0cbca9-01d8-40bf-bf2e-c2159068d773",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f6f7a4c154982a8ecc38407873595778f16d2f9d4afcef5f185c7e6412121b1b"
+  },
+  "id": "pmWsSQ6GLA9iiBSr",
+  "tags": []
+}
