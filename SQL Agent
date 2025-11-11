@@ -1,0 +1,78 @@
+{
+  "name": "SQL Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.query }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1312,
+        96
+      ],
+      "id": "56e1613a-f135-46c0-a1fb-9bd7d52d532a",
+      "name": "Execute a SQL query",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "fESbZZtdila39ejQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "c12e8328-4752-4f56-835a-9ff55ecc6d39",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1056,
+        96
+      ]
+    }
+  ],
+  "pinData": {
+    "Start": [
+      {
+        "json": {
+          "query": "SELECT vaccine_id, vaccine_name, manufacturer, dose_count, storage_temp, created_at, updated_at FROM vaccines WHERE LOWER(storage_temp) = LOWER('10');"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Execute a SQL query": {
+      "main": [
+        []
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1c0da021-8d81-424a-b1f3-f13c078b76cd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f6f7a4c154982a8ecc38407873595778f16d2f9d4afcef5f185c7e6412121b1b"
+  },
+  "id": "WejJPRLvbrnP6VqM",
+  "tags": []
+}
