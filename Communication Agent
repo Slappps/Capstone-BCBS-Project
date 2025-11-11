@@ -1,0 +1,233 @@
+{
+  "name": "Communication Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "User Input"
+            },
+            {
+              "name": "SQL Data"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "Communication Agent",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=##Email Request from User: {{ $json['User Input'] }}\n##Data:\n{{ $json['SQL Data'] }}",
+        "options": {
+          "systemMessage": "=# AI Email Assistant\n\nYou are an AI Email Assistant that receives filtered data and sends professional, personalized emails using the Gmail Send Node.\n\n## Input Requirements\n\n- Pre-filtered recipient data (already filtered for email contact preference)\n- Contains: email addresses, names, and context variables\n- Format: JSON array or structured database results\n\n**CRITICAL - Verify Contact Method:**\n- Even though data should be pre-filtered, ALWAYS verify that each recipient has `preferred_contact_method` set to \"Email\" (or similar)\n- If the field exists in the data, check it before sending\n- Skip any recipients where preferred_contact_method is not \"Email\"\n- Log skipped recipients with reason: \"Contact method preference is not Email\"\n\n## Workflow\n\n### Step 1: Parse and Validate Input\n\n- Extract recipient details from input data\n- Check if `preferred_contact_method` field exists and equals \"Email\" (case-insensitive)\n- Validate each email address (must contain @ and domain)\n- Log any invalid emails or incorrect contact preferences for skipping\n\n### Step 2: Compose Individual Emails\n\nFor each valid recipient, generate:\n\n**Subject Line:**\n- Under 60 characters\n- Include key context variables\n- Example: \"Congratulations on Completing Your {{vaccine_name}}!\"\n\n**Email Body:**\n```\nHello {{first_name}},\n\n[Personalized message content using workflow variables]\n\n[Supporting details]\n\nBest regards,\n{{organization_name}}\n```\n\n### Step 3: Send via Gmail Node\n\nFor each recipient, invoke the Gmail Send Node:\n- **To:** recipient email address\n- **Subject:** generated subject\n- **Message:** formatted body\n\nSend emails **one at a time** - never batch multiple recipients.\n\n### Step 4: Log Results\n\nTrack all outcomes:\n\n```json\n{\n  \"summary\": {\n    \"sent\": 8,\n    \"failed\": 1,\n    \"skipped\": 2\n  },\n  \"details\": {\n    \"sent_to\": [\"email1@example.com\", \"email2@example.com\"],\n    \"failed\": [{\"email\": \"invalid@\", \"reason\": \"Invalid format\"}],\n    \"skipped\": [\n      {\"email\": \"user@example.com\", \"reason\": \"Contact method preference is not Email\"},\n      {\"email\": \"another@example.com\", \"reason\": \"Contact method preference is SMS\"}\n    ]\n  }\n}\n```\n\n## Rules\n\n- Send each email individually\n- Validate email addresses before sending\n- ALWAYS check preferred_contact_method if the field exists in data\n- Skip recipients whose preferred contact method is not \"Email\"\n- Use proper formatting (\\n\\n for paragraphs)\n- Never include multiple recipients in one message\n- Always return a send summary with details on sent, failed, and skipped\n\n## Example Flow\n\n**Input:** 10 patients who completed vaccine (filtered for Email preference)  \n**Output:** 10 individual congratulatory emails sent via Gmail\n\n**Input with mixed preferences:** 12 patients (10 Email, 2 SMS)  \n**Output:** 10 emails sent, 2 skipped (logged as \"Contact method preference is not Email\")"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        352
+      ],
+      "id": "8265c7fb-e257-418b-8157-74ef4548f0f3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "sendTo": "eliholson23@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1024,
+        832
+      ],
+      "id": "bf3830a3-be4e-4e2d-88f0-fc9397567d6c",
+      "name": "Send a message in Gmail",
+      "webhookId": "754cc1da-25a4-48cc-b524-181ac4047fe2",
+      "credentials": {
+        "googleApi": {
+          "id": "kxF0Tc6oYspVnU9c",
+          "name": "Unnamed credential"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        576
+      ],
+      "id": "ab6bd995-b70d-4018-b82b-f4eba35a4b50",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "pysysAiKcZ2Jj2e6",
+          "name": "OpenAi account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilioTool",
+      "typeVersion": 1,
+      "position": [
+        896,
+        560
+      ],
+      "id": "bf8cf1da-9a8a-4ba3-9bd6-5445bf344b7d",
+      "name": "Send an SMS/MMS/WhatsApp message in Twilio",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "eliholson23@gmail.com",
+        "toEmail": "eliholson23@gmail.com",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "emailFormat": "text",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.emailSendTool",
+      "typeVersion": 2.1,
+      "position": [
+        704,
+        576
+      ],
+      "id": "1a89a94d-3f25-4415-a8e1-86bdaee8f92b",
+      "name": "Send email in Send Email",
+      "webhookId": "b5df880c-3f9e-40fa-b823-301737492565",
+      "credentials": {
+        "smtp": {
+          "id": "dkFdEpUOiwsHZuJs",
+          "name": "SMTP account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        528,
+        592
+      ],
+      "id": "df1eee74-f5e8-4360-8469-7fbe8b6b0ae2",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "R7zGRQ258Wn7nkAn",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Communication Agent": [
+      {
+        "json": {
+          "User Input": "Send hello world email for first 2 people\n\n",
+          "SQL Data": "[{\"patient_id\":1,\"first_name\":\"Harley\",\"last_name\":\"Shuttle\",\"email\":\"hshuttle0@mapy.cz\"},{\"patient_id\":2,\"first_name\":\"Myrvyn\",\"last_name\":\"Thorowgood\",\"email\":\"mthorowgood1@msn.com\"}]"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Communication Agent": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message in Twilio": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send email in Send Email": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb268c58-77ea-4113-9f7a-e59b808bae50",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f6f7a4c154982a8ecc38407873595778f16d2f9d4afcef5f185c7e6412121b1b"
+  },
+  "id": "ckZt8ISeObqm5VeA",
+  "tags": []
+}
