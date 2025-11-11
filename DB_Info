@@ -1,0 +1,127 @@
+{
+  "name": "DB_Info",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n    c.table_name,\n    c.column_name,\n    c.data_type,\n    fk.referenced_table,\n    fk.referenced_column\nFROM\n    information_schema.columns AS c\n    LEFT JOIN (\n        SELECT\n            kcu.table_schema,\n            kcu.table_name,\n            kcu.column_name,\n            ccu.table_name AS referenced_table,\n            ccu.column_name AS referenced_column\n        FROM\n            information_schema.table_constraints AS tc\n            JOIN information_schema.key_column_usage AS kcu\n              ON tc.constraint_name = kcu.constraint_name\n              AND tc.table_schema = kcu.table_schema\n            JOIN information_schema.constraint_column_usage AS ccu\n              ON ccu.constraint_name = tc.constraint_name\n              AND ccu.table_schema = tc.table_schema\n        WHERE\n            tc.constraint_type = 'FOREIGN KEY'\n    ) AS fk\n    ON c.table_schema = fk.table_schema\n    AND c.table_name = fk.table_name\n    AND c.column_name = fk.column_name\nWHERE\n    c.table_schema = 'public'\nORDER BY\n    c.table_schema, c.table_name, c.ordinal_position;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        880,
+        -144
+      ],
+      "id": "31d42e92-e2e1-43ff-9d13-003cd7c504f8",
+      "name": "Execute a SQL query1",
+      "credentials": {
+        "postgres": {
+          "id": "fESbZZtdila39ejQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        -144
+      ],
+      "id": "d1a9d646-bfbf-4adb-b5f9-25568891ecd5",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8e7809e9-c527-46d8-bad0-96fca3f055c9",
+              "name": "Output",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1296,
+        -144
+      ],
+      "id": "3bb4eaa1-805a-4c0a-9b99-bbfdf7ed423b",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "b602e44d-2d08-487d-bb66-0ccdef18c627",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        672,
+        -144
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Execute a SQL query1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        []
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b0e98fef-30a7-43d6-84e1-d12a7b78d0ee",
+  "meta": {
+    "instanceId": "f6f7a4c154982a8ecc38407873595778f16d2f9d4afcef5f185c7e6412121b1b"
+  },
+  "id": "44Pu4tN7jwaolOnS",
+  "tags": []
+}
