@@ -1,6 +1,6 @@
 
 
-**Care Signals work requirement part one, Create a proof of concept with the following propertes:**<br>
+**Care Signals work requirement part one-three, Create a proof of concept with the following propertes:**<br>
 
 **Milestone1:** Working Broadcast POC - broadcast messages to all test members ("flu shot campaign") AND LLM generated samples pertinent to member segmentations. Complete data mapping for both broad outreach segments 
 and individual needs. Basic routing infrastructure in place.<br>
@@ -33,6 +33,18 @@ May need to set up SMTP account<br>
 May need to set up DB connection<br>
 Must need to set up vector storage<br>
 
+**Milestone3:** Simplification and structure changes for CPT coding workflow.<br>
+
+Focused on updating the functionality and accuracy of cpt tagging<br>
+User must be able to pull CPT codes based on a doctors note<br>
+Project must implement updated CPT codes<br>
+Agent must only pull from provided data, and not make up its own codes.
+
+**Execution:**<br>
+The files can be downloaded from the main git, and run via N8N<br>
+Please create a qdrant account to store data<br>
+Will need an open ai account<br>
+
 **Release Notes**<br>
 Version 1<br>
 Include a section called, "Release notes" - explain what is working in this submission (add explanation if this is not consistent with the milestone as described in the Project Plan)<br>
@@ -46,6 +58,14 @@ Cleaned up automation workflow by using a central AI Agent with many sub workflo
 Added a communication agent to broadcast messages<br>
 Added a vector storage to hold and chunk CPT information<br>
 User can now request informaiton about a user in the database more effectively<br>
+
+Version 3<br>
+
+CPT coding automation is available from the main workflow<br>
+Sentence chunking no longer needed due to qdrant storage technique<br>
+Changes to tool and main agent promtps to acheive more desierable output<br>
+Uploaded new cpt codes into qdrant data set<br>
+
 
   
   
