@@ -1,5 +1,4 @@
 {
-  "name": "Demo: RAG in n8n",
   "nodes": [
     {
       "parameters": {
@@ -7,7 +6,7 @@
         "formFields": {
           "values": [
             {
-              "fieldLabel": "Upload your file(s)",
+              "fieldLabel": "data",
               "fieldType": "file",
               "acceptFileTypes": ".pdf, .csv",
               "requiredField": true
@@ -19,7 +18,7 @@
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.2,
       "position": [
-        -176,
+        -144,
         0
       ],
       "id": "f7a656ec-83fc-4ed2-a089-57a9def662b7",
@@ -33,8 +32,8 @@
       "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
       "typeVersion": 1.2,
       "position": [
-        384,
-        608
+        368,
+        544
       ],
       "id": "6ea78663-cf2f-4f2d-8e68-43047c2afd87",
       "name": "Embeddings OpenAI",
@@ -49,35 +48,16 @@
       "parameters": {
         "dataType": "binary",
         "loader": "csvLoader",
-        "textSplittingMode": "custom",
-        "options": {
-          "column": "Cluster"
-        }
+        "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
       "typeVersion": 1.1,
       "position": [
-        272,
-        160
+        224,
+        176
       ],
       "id": "94aecac0-03f9-4915-932b-d14a2576607b",
       "name": "Default Data Loader"
-    },
-    {
-      "parameters": {
-        "content": "### Readme\nLoad your data into a vector database with the 📚 **Load Data** flow, and then use your data as chat context with the 🐕 **Retriever** flow.\n\n**Quick start**\n1. Click on the `Execute Workflow` button to run the 📚 **Load Data** flow.\n2. Click on `Open Chat` button to run the 🐕 **Retriever** flow. Then ask a question about content from your document(s)\n\n\nFor more info, check [our docs on RAG in n8n](https://docs.n8n.io/advanced-ai/rag-in-n8n/).",
-        "height": 300,
-        "width": 440,
-        "color": 4
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        -656,
-        -64
-      ],
-      "typeVersion": 1,
-      "id": "0d07742b-0b36-4c2e-990c-266cbe6e2d4d",
-      "name": "Sticky Note"
     },
     {
       "parameters": {
@@ -94,26 +74,6 @@
       "typeVersion": 1,
       "id": "d19d04f3-5231-4e47-bed7-9f24a4a8f582",
       "name": "Sticky Note1"
-    },
-    {
-      "parameters": {
-        "mode": "insert",
-        "memoryKey": {
-          "__rl": true,
-          "value": "vector_store_key",
-          "mode": "list",
-          "cachedResultName": "vector_store_key"
-        }
-      },
-      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
-      "typeVersion": 1.2,
-      "position": [
-        192,
-        -272
-      ],
-      "id": "bf50a11f-ca6a-4e04-a6d2-42fee272b260",
-      "name": "Insert Data to Store",
-      "disabled": true
     },
     {
       "parameters": {
@@ -205,16 +165,17 @@
         "mode": "insert",
         "qdrantCollection": {
           "__rl": true,
-          "value": "CPT_codes",
+          "value": "CPT_codes_final",
           "mode": "list",
-          "cachedResultName": "CPT_codes"
+          "cachedResultName": "CPT_codes_final"
         },
+        "embeddingBatchSize": 1,
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
       "typeVersion": 1.3,
       "position": [
-        192,
+        64,
         0
       ],
       "id": "02c552cf-a49f-4c1a-bbad-c0a12d960bf1",
@@ -254,19 +215,6 @@
       }
     },
     {
-      "parameters": {
-        "chunkSize": 100000
-      },
-      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
-      "typeVersion": 1,
-      "position": [
-        384,
-        288
-      ],
-      "id": "cdad44b6-ba01-44cc-9f44-2f49ac3f42e1",
-      "name": "Character Text Splitter"
-    },
-    {
       "parameters": {},
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
@@ -276,31 +224,14 @@
       ],
       "id": "02e89837-fb82-458d-a627-3bc57126a5de",
       "name": "Simple Memory"
-    },
-    {
-      "parameters": {
-        "aggregate": "aggregateAllItemData",
-        "include": "specifiedFields",
-        "fieldsToInclude": "Cluster",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        16,
-        0
-      ],
-      "id": "a4c49fb3-0530-4b65-b681-9d59e8df0dc1",
-      "name": "Aggregate"
     }
   ],
-  "pinData": {},
   "connections": {
     "Upload your file here": {
       "main": [
         [
           {
-            "node": "Aggregate",
+            "node": "Qdrant Vector Store",
             "type": "main",
             "index": 0
           }
@@ -367,17 +298,6 @@
         ]
       ]
     },
-    "Character Text Splitter": {
-      "ai_textSplitter": [
-        [
-          {
-            "node": "Default Data Loader",
-            "type": "ai_textSplitter",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Simple Memory": {
       "ai_memory": [
         [
@@ -388,29 +308,12 @@
           }
         ]
       ]
-    },
-    "Aggregate": {
-      "main": [
-        [
-          {
-            "node": "Qdrant Vector Store",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1"
-  },
-  "versionId": "ae22c6f4-a923-4638-ba14-808aa9ba5e6c",
+  "pinData": {},
   "meta": {
     "templateId": "rag-starter-template",
     "templateCredsSetupCompleted": true,
     "instanceId": "f6f7a4c154982a8ecc38407873595778f16d2f9d4afcef5f185c7e6412121b1b"
-  },
-  "id": "lglHgbqhpZKwVxw1",
-  "tags": []
+  }
 }
