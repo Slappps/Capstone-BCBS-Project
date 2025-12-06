@@ -45,6 +45,19 @@ The files can be downloaded from the main git, and run via N8N<br>
 Please create a qdrant account to store data<br>
 Will need an open ai account<br>
 
+
+**Milestone4:** Create after care plan given a procedure.<br>
+
+Added SerpAPI account for web browsing
+Updated prompt to support after care message generation
+Updated tool descriptions for main agent use
+
+**Execution:**<br>
+The files can be downloaded from the main git, and run via N8N<br>
+Please create a qdrant account to store data<br>
+Please create a serpAPI account
+Will need an open ai account<br>
+
 **Release Notes**<br>
 Version 1<br>
 Include a section called, "Release notes" - explain what is working in this submission (add explanation if this is not consistent with the milestone as described in the Project Plan)<br>
@@ -65,6 +78,12 @@ CPT coding automation is available from the main workflow<br>
 Sentence chunking no longer needed due to qdrant storage technique<br>
 Changes to tool and main agent promtps to acheive more desierable output<br>
 Uploaded new cpt codes into qdrant data set<br>
+
+Version 4<br>
+
+Can now prompt the agent to generate an after care report<br>
+Report can be generated from a "one off" request, or as part of a follow up to the cpt coding<br>
+
 
 
   
